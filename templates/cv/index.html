@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+
+{% macro desc(abstract, description)%}
+{% if description %}
+<div class=job_description>
+  {{abstract | safe}}
+  <img class="read_more_icon" src="read_more.png"/>
+</div>
+<div class=job_long_description>
+  {{description}}
+  <img class="read_more_icon" src="read_less.png"/>
+</div>
+{% else %}
+{{abstract | safe}}
+{% endif %}
+{% endmacro desc %}
+
+{% macro job(title, dates, abstract, description, institutes, tools) %}
+  <div class=job>
+	<div class=job_header>
+	  <div class=job_dates> {{dates}}</div>
+	  <div class=job_title>
+		{{title}}
+	  </div>
+
+	  <div class=job_header_logos>
+		{% for i in institutes %}
+		<a href={{i.url}}>
+		  <img src={{i.logo}} class="logo" />
+		</a>
+		{% endfor %}
+	  </div>
+	  	</div>
+	<div class=job_content>
+		{% if tools %}
+		<div class=cube>
+		  {{self::desc(abstract=abstract, description=description)}}
+		</div>
+	  <div class=job_languages>
+		{% for tool in tools %}
+		<a href={{tool.url}}>
+		  <img src={{tool.logo}} class="logo" />
+		</a>
+		{% endfor %}
+	  </div>
+	  {% else %}
+		<div class=cube style="width: 100%">
+		  {{self::desc(abstract=abstract, description=description)}}
+		</div>
+	  {% endif %}
+
+	</div>
+  </div>
+{% endmacro job %}
+
+{% block content %}
+  <div id=header>
+	<div class=image-cropper>
+	  <img src="pic_bright.png" alt="picture" id="picture">
+	</div>
+	<div contact>
+	<div style="margin-left: 1em"> <h1>{{page.extra.name}}</h1></div>
+	<div style="display:flex; align-items:center" id="mail_div"> <img src="email.png" style="height:1.5em; margin:1em"/> </div>
+	<div style="display:flex; align-items:center"><img src="github.png" style="height:1.5em; margin:1em"/><a href="{{page.extra.github}}" class="nostyle"> {{page.extra.github}} </a> </div>
+	</div>
+  </div>
+  {% for job in page.extra.jobs %}
+  {{self::job(title=job.title, dates=job.dates, abstract=job.abstract, description=job.description, institutes=job.institutes, tools=job.tools)}}
+  {% endfor %}
+
+<script>
+  let coll = document.getElementsByClassName("read_more_icon");
+  for (let i = 0; i < coll.length; i++) {
+	  coll[i].addEventListener("click", function() {
+		  console.log(this);
+		  console.log(this.parentNode);
+		  this.parentNode.parentNode.classList.toggle("active");
+	  });
+  }
+</script>
+<script>
+  let mail = document.getElementById('mail_div');
+  console.log(mail);
+  {% for s in page.extra.mail%}
+  mail.innerHTML+="{{s | safe}}";
+  {% endfor %}
+</script>
+{% endblock content %}
+
